@@ -1,0 +1,16 @@
+1.retarget.c文件需增加STDIO宏定义
+2.注意：文件bootloader和application工程共用一个regarget.c文件，
+  但application工程中的retarget.c文件没有增加STDIO定义，
+  所以在编译。。。。。。。，后期obj要修改成不同文件夹,开始没考虑到
+
+3.待优化问题列表：
+	1.jtag加锁测试
+	2.jtag密码
+	4.打印优化
+	5.xmodem改写优化
+	6.fs time问题
+
+4.疑问：
+	1.format在boot和app下回显吗，用getkey来实现不回显jtag密码
+	2.测试retarget.o冲突问题
+

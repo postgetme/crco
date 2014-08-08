@@ -1,0 +1,339 @@
+1.浮点数不能正常打印，可使用堆栈8字节对齐解决，写法如下：
+__align(8) OS_STK TEST1_STK[100];
+
+2.IO操作方法
+OUT MODE:
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+	GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
+	GPIODirModeSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_DIR_MODE_OUT);
+
+	GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
+	GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+
+IN MODE:
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+	GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+	GPIODirModeSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_DIR_MODE_IN);
+
+	state = GPIOPinRead(GPIO_PORTD_BASE,GPIO_PIN_1);
+
+3.定时器使用方法
+见6.旋转编码器驱动，里面含有通用定时器使用方法
+
+4.LCD测试代码
+INT8U i, j;
+lcd_init ();
+
+lcd_light (1);
+OSTimeDly (50);
+
+lcd_light (0);
+OSTimeDly (50);
+
+lcd_light (1);
+OSTimeDly (50);
+
+while (1)
+{
+	draw_rectangle (0, 0, 127, 63, 1);
+	OSTimeDly (100);
+	draw_rectangle (10, 10, 100, 50, 1);
+	OSTimeDly (100);
+	draw_rectangle (0, 0, 127, 63, 0);
+	OSTimeDly (100);
+	draw_rectangle (10, 10, 100, 50, 0);
+	OSTimeDly (100);
+	draw_rectangle_fill (0, 0, 127, 63, 1);
+	OSTimeDly (100);
+	draw_rectangle_fill (10, 10, 100, 50, 0);
+	OSTimeDly (100);
+	draw_rectangle_fill (0, 0, 127, 63, 0);
+	OSTimeDly (100);
+	draw_rectangle_fill (0, 0, 127, 63, 1);
+	OSTimeDly (100);
+	draw_line (20, 20, 111, 58, 0);
+	OSTimeDly (100);
+	draw_rectangle_fill (0, 0, 127, 63, 0);
+	OSTimeDly (100);
+	draw_line (20, 20, 111, 58, 1);
+	OSTimeDly (100);
+
+	lcd_clear ();
+
+	font_print (0, 0, "模块hello华为 ! ?设备", 1);
+	font_print (0, 2, "模块hello华为 ! ?设备", 0);
+	OSTimeDly (100);
+	lcd_clear ();
+
+	font_print (0, 0, "模块hello华为 ! ?设备", 0);
+	font_print (0, 2, "模块hello华为 ! ?设备", 1);
+	OSTimeDly (100);
+	lcd_clear ();
+
+	font_print (0, 0, "模块hello华为 ! ?", 1);
+	font_print (0, 2, "模块hello华为 ! ??", 0);
+	OSTimeDly (100);
+	lcd_clear ();
+
+	font_print (0, 0, "模块hello华为 ! ??", 0);
+	font_print (0, 2, "模块hello华为 ! ??", 1);
+	OSTimeDly (100);
+	lcd_clear ();
+
+	font_print (0, 0, "模块hello华为 ! ?", 1);
+	font_print (0, 2, "模块hello华为 ! ??", 0);
+	OSTimeDly (100);
+	lcd_clear ();
+
+	font_print (0, 0, "模块hello华为 ! ??", 0);
+	font_print (0, 2, "模块hello华为 ! ??", 1);
+	OSTimeDly (100);
+	lcd_clear ();
+
+	for (i = 0; i < 128; i++)
+	{
+	 	for (j = 0; j < 8; j++)
+		{
+	 		lcd_write_byte (i, j, 0xf0);
+		}
+	}
+		OSTimeDly (50);
+
+	for (i = 0; i < 128; i++)
+	{
+	 	for (j = 0; j < 8; j++)
+		{
+	 		lcd_write_byte (i, j, 0x0f);
+		}
+	}
+		OSTimeDly (50);
+
+		lcd_clear ();
+
+	for (i = 0; i < 128; i++)
+	{
+	 	for (j = 0; j < 64; j++)
+		{
+	 		lcd_write_dot (i, j, 1);
+		}
+	}
+	OSTimeDly (50);
+
+	lcd_clear ();
+	OSTimeDly (50);
+
+	for (i = 0; i < 128; i++)
+	{
+ 		lcd_v_line (i, 0, 63, 1);
+	}
+	OSTimeDly (50);
+
+	for (i = 0; i < 128; i++)
+	{
+ 		lcd_v_line (i, 0, 63, 0);
+	}
+
+	OSTimeDly (50);
+
+	lcd_clear ();
+	for (i = 0; i < 64; i++)
+	{
+ 		lcd_h_line (0, i, 127, 1);
+	}
+	OSTimeDly (50);
+
+	for (i = 0; i < 64; i++)
+	{
+ 		lcd_h_line (0, i, 127, 0);
+	}
+	OSTimeDly (50);
+}
+
+5.shell API用法和命令添加方法
+第一步，编写命令功能代码
+static void cmd_test (void* pdat)
+{
+ 	INT16U i;
+	INT8U argc;
+	char** argv;
+	static char buf[100];
+	INT16U len;
+
+	argc = ((SHELL_CMD_PARA*)pdat)->argc;
+	argv = ((SHELL_CMD_PARA*)pdat)->argv;
+
+	shell_printf ("agrc = %d\r\n", argc);
+
+	for (i = 0; i < argc; i++)
+	{
+	 	shell_printf ("argv[%d] = '%s'\r\n", i, argv[i]);
+	}
+
+	shell_printf ("\r\nyou can press 'ctrl + c' to exit at anytime! don't forget!!!\r\n");
+	shell_printf ("\r\npress 'enter' to continue...\r\n"); 
+	shell_read ((INT8U*)buf, sizeof (buf));
+	
+	shell_printf ("\r\nplease input some words:\r\n");
+	len = shell_read ((INT8U*)buf, sizeof (buf));
+	shell_printf ("\r\n\r\nyour input is:\r\n"); 
+	shell_write ((INT8U*)buf, len);
+	shell_printf ("\r\n");
+
+	shell_printf ("\r\npress 'enter' to continue...\r\n"); 
+	shell_read ((INT8U*)buf, sizeof (buf));
+
+	shell_printf ("\r\nit will print 'hello world' 999 times!\r\npress 'enter' to continue...\r\n");
+	shell_read ((INT8U*)buf, sizeof (buf));
+
+	shell_printf ("\r\n");
+
+	for (i = 1; i <= 999; i++)
+	{
+		shell_printf ("hello world! [%d]\r\n", i);
+		OSTimeDly (10);
+	}
+
+	shell_printf ("\r\nthe test is complete!\r\n\r\npress 'enter' to exit!"); 
+	shell_read ((INT8U*)buf, sizeof (buf));
+
+	shell_return ();
+}
+第二步，注册命令
+shell_cmd_register ("test", cmd_test, "a test, it format is 'test [*] [*] [*] ...'");
+
+6.旋转编码器驱动，将以下代码覆盖key_phy.c，根据实际电路修改相应管脚
+//KEY_2.0 Designed by Mei_Lin at 20101224
+
+#include "../../MyLib/my_lib.h"
+
+void Timer1A(void)
+{
+	INT8U pc;
+	INT8U pd;
+	INT8U code1_a,code1_b,code2_a,code2_b;
+									    
+	static INT8U aold,bold; //定义了两个变量用来储蓄上一次调用此方法是编码开关两引脚的电平 
+    static INT8U st; //定义了一个变量用来储蓄以前是否出现了两个引脚都为高电平的状态 
+
+	static INT8U aold2,bold2; //定义了两个变量用来储蓄上一次调用此方法是编码开关两引脚的电平 
+    static INT8U st2; //定义了一个变量用来储蓄以前是否出现了两个引脚都为高电平的状态 
+
+	TimerIntClear(TIMER1_BASE, TIMER_TIMA_TIMEOUT);    // 清除定时器1中断。
+
+	pc = GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_5 | GPIO_PIN_7);
+	pd = GPIOPinRead(GPIO_PORTD_BASE,GPIO_PIN_0 | GPIO_PIN_1);
+
+	code1_a = pc & GPIO_PIN_7 ? 1:0;
+	code1_b = pc & GPIO_PIN_5 ? 1:0;
+
+	code2_a = pd & GPIO_PIN_1 ? 1:0;
+	code2_b = pd & GPIO_PIN_0 ? 1:0;
+
+    if(code1_a&&code1_b) 
+	{
+		st = 1; //如果两个引脚都为高电平则把st置1 
+	}
+    if(st) //如果st为1执行下面的步骤 
+    { 
+	    if(code1_a==0&&code1_b==0) //如果当前编码开关的两个引脚都为底电平执行下面的步骤 
+	    { 
+		    if(bold) //如果上一次调用时编码开关b引脚为高说明编码开关在向加大的方向转 
+		    { 
+		    	st = 0; 
+		    	key_msg_post (KEY_2_DOWN);
+		    } 
+		    if(aold) //如果上一次调用时编码开关a引脚为高说明编码开关在向减小的方向转 
+		    { 
+		    	st = 0; 
+		    	key_msg_post (KEY_1_DOWN);
+		    } 
+	    } 
+    } 
+    aold = code1_a; //储蓄a到aold 
+    bold = code1_b; //储蓄b到bold 
+
+	if(code2_a&&code2_b) 
+	{
+		st2 = 1; //如果两个引脚都为高电平则把st置1 
+	}
+    if(st2) //如果st为1执行下面的步骤 
+    { 
+	    if(code2_a==0&&code2_b==0) //如果当前编码开关的两个引脚都为底电平执行下面的步骤 
+	    { 
+		    if(bold2) //如果上一次调用时编码开关b引脚为高说明编码开关在向加大的方向转 
+		    { 
+		    	st2 = 0; 
+		    	key_msg_post (KEY_4_DOWN);
+		    } 
+		    if(aold2) //如果上一次调用时编码开关a引脚为高说明编码开关在向减小的方向转 
+		    { 
+		    	st2 = 0; 
+		    	key_msg_post (KEY_3_DOWN);
+		    } 
+	    } 
+    } 
+    aold2 = code2_a; //储蓄a到aold 
+    bold2 = code2_b; //储蓄b到bold 
+}
+
+void key_phy_init (void)
+{
+	//code1_a pc7
+	//code1_b pc5
+	//code1_key swdio pc1
+	
+	//code2_a pd1
+	//code2_b pd0
+	//code2_key swclk pc0
+	
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+	GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_5 | GPIO_PIN_7, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+	GPIODirModeSet(GPIO_PORTC_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_5 | GPIO_PIN_7, GPIO_DIR_MODE_IN);
+	
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+	GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+	GPIODirModeSet(GPIO_PORTD_BASE, GPIO_PIN_0 | GPIO_PIN_1, GPIO_DIR_MODE_IN);
+
+	SysCtlPeripheralEnable( SYSCTL_PERIPH_TIMER1 );        // 使能定时器1外设。
+	TimerConfigure(TIMER1_BASE, TIMER_CFG_32_BIT_PER); // 设置定时器1为周期触发模式。
+	TimerLoadSet(TIMER1_BASE, TIMER_A, SysCtlClockGet()/1000); // 设置定时器装载值。定时1ms。
+	TimerIntRegister(TIMER1_BASE,TIMER_A,Timer1A);
+	TimerIntEnable(TIMER1_BASE, TIMER_TIMA_TIMEOUT);// 设置定时器为溢出中断。
+	TimerEnable(TIMER1_BASE, TIMER_A); 
+}  
+
+INT32U key_phy_read (void)
+{
+	INT8U pc;
+	INT8U code1_key,code2_key;
+
+	INT32U ret = 0xffffffff;
+
+	pc = GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_0 | GPIO_PIN_1);
+
+	code1_key = pc & GPIO_PIN_1 ? 1:0;
+	code2_key = pc & GPIO_PIN_0 ? 1:0;
+
+	if (code1_key == 0)
+	{
+	 	ret &= ~(1 << 4);
+	}
+ 	if (code2_key == 0)
+	{
+	 	ret &= ~(1 << 5);
+	}
+
+   	return ret;
+}
+
+7.加入TCPNET方法
+	1.新建文件夹TCP
+	2.拷贝Net_Config.c	LM3S_EMAC.c	LM3S_EMAC.h到TCP文件夹
+	3.添加TCP文件夹中的文件到工程,添加TCP_CM3.lib到工程
+	4.在App_TimeTickHook()运行TCP时钟函数time_tick ()
+	5.增加以太网中断	
+		EXTERN  EthernetIntHandler        
+		DCD     EthernetIntHandler          ; Ethernet
+	6.系统初始化时调用		init_TcpNet ();
+	7.最低优先级任务运行	while (1) {main_TcpNet();}
+	8.注意,用静态IP时,#define DHCP_ENABLE    0

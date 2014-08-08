@@ -1,0 +1,30 @@
+1.不能用驱动库DriverLib.lib，因为要修改驱动库中的interrupt.c文件，使其支持中断向量偏移。
+
+2.待优化问题列表：
+	1.上电jtag加锁
+	2.i2c改写，串口改写，时钟改写，自动星期，多定时器
+	3.串口可配置，485可配置
+	4.打印优化
+	5.gui优化
+	6.fs time问题
+	7.加网络
+	8.free MB移植
+	9.指示灯构思
+	10.rst按键
+	11.rtc读写互斥
+	12.i2c操作互斥
+	13.唯一序列号加密
+
+
+3.
+MB com, MB tcp -> web
+MB com, MB tcp -> web, snmp
+MB com -> MB tcp
+MB tcp -> MB com
+tcp -> com
+MB com, MB tcp -> web, script
+
+4.电总，主从
+
+5.lua
+

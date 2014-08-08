@@ -1,0 +1,14 @@
+7. 按键驱动和GUI例子修改
+8. LCD驱动配制
+9. SD FLASH可配制
+
+11. TCP
+12. CFG文件
+13. MODBUS主从
+14. bootloader加密码锁
+15. bootloader和app配制相同，包括串口参数，485参数，文件系统参数
+16. 其它驱动，PWM，旋转编码器，18B20，PCA9555，24C64
+17. GUI控件优化，结构优化
+18. shell优化
+19. 双色LED驱动和RESET驱动，可合并为YD驱动
+20. SD卡检测
